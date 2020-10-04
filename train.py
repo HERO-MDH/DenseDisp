@@ -67,139 +67,52 @@ class SimulatedAnnealer(Annealer):
 
     def move(self):
 
-        print('////////////////////////////////////////////')
-        #print('first len==',len(self.state))
-        #print(1)
+
         valids=[]
-        #print(2)
         others=[]
-        #print(3)
         layers=[['conv2d',32,'same',3],['conv2d',32,'same',5],['conv2d',32,'same',7],['conv2d',32,'same',11],['batch',0,'none',0]]
-        #print(4)
         for i in self.state:
-            #print(5)
             if i[0]=='conv2d':
-                #print(6)
                 if i[2]=='valid':
-                    #print(7)
-                    #print('vvvvvvvvvvvvvvvvvvv',i[3])
                     if i[3]>3:
-                        #print(8)
-
-
                         valids.append(self.state.index(i))
-                        #print(9)
                     else:
-                        #print('dw')
                         pass
                 else:
-                    #print(10)
                     others.append(self.state.index(i))
-                    #print(11)
             else:
-                #print(12)
                 others.append(self.state.index(i))
-                #print(13)
         if len(valids)!=0:
-            #print(14)
-
             if random.random()<0.2:
-                #print(15)
-                #print('valid change')
-
-                #print('valids=',valids)
                 a=random.choice(valids)
-                '''print('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
-                for i in valids:
-                    print(self.state[i])
-                print('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh')'''
-                #print(16)
-                #print('state index',a)
-                #print(self.state[a])
                 b=random.randrange(3,self.state[a][3],2)
-                #print(17)
-                #print('kernel',b)
-
-                #print('hrt',b)
                 temp=self.state[a][3]
-                #print(18)
-                #print('temp',temp)
                 self.state[a][3]=b
-                #print(19)
-                #print('starteter',self.state[a])
                 self.state.append(['conv2d',32,'valid',(temp-b)+1])
-                #print(20)
-                #print(self.state)
 
             elif random.random()>=0.2 and random.random()<0.7:
-                #print(21)
-                print('others change')
-                '''print('ergthyjukyjtrewq ertyujhtrew')
-                for i in others:
-                    print(self.state[i])
-                print('fwrgthrgegregggergrgrgergegge')'''
-                #print(22)
                 a=random.choice(others)
-                #print(23)
                 be=random.choice(layers)
-                #print(24)
-                #print(a)
-                #print(25)
-                #print('be',be)
-                #print(26)
-                #self.state[a]=be
                 self.state.remove(self.state[a])
                 self.state.append(be)
-                #print(27)
             else:
-                #print(28)
-                print('sweap')
-                #print(29)
-
                 a=random.randint(0,len(self.state)-1)
-                #print(30)
                 b=random.randint(0,len(self.state)-1)
-                print(a,b)
-                #print(31)
                 temp1=self.state[a]
                 self.state[a]=self.state[b]
                 self.state[b]=temp1
-                #self.state[a],self.state[b]=self.state[b],self.state[a]
-                #print(32)
         else:
-            #print(33)
-            print('else')
-            #print(34)
             if random.random()<0.5:
-                #print(35)
-                print('others change')
-                #print(36)
                 a = random.choice(others)
-                #print(37)
-                #print(a)
-                #print(38)
                 be = random.choice(layers)
-                #print(39)
-                #print('be', be)
-                #print(40)
-                #self.state[a] = be
                 self.state.remove(self.state[a])
                 self.state.append(be)
-                #print(41)
             else:
-                #print(42)
-                print('sweap')
-                #print(43)
                 a = random.randint(0, len(self.state) - 1)
-                #print(44)
                 b = random.randint(0, len(self.state) - 1)
-                #print(45)
                 temp1 = self.state[a]
                 self.state[a] = self.state[b]
                 self.state[b] = temp1
-                #self.state[a], self.state[b] = self.state[b], self.state[a]
-                #print(46)
-        print(len(self.state),self.state)
         kernel_sum=0
         num_node=0
         for i in self.state:
@@ -209,16 +122,11 @@ class SimulatedAnnealer(Annealer):
                     num_node+=1
         ex=kernel_sum-num_node
         if ex!=36:
-            #print('2',self.state)
             self.state.append(['conv2d',32,'valid',(36-ex)+1])
-            #raise ValueError('this is not appropriante')
-        #print(47)
-        print('self state type',type(self.state))
 
         return self.energy()
 
     def energy(self):
-        #print(self.state)
         kernel_sum=0
         num_node=0
         for i in self.state:
@@ -232,10 +140,7 @@ class SimulatedAnnealer(Annealer):
             raise ValueError('this is not appropriante')
 
 
-
-        print('self num=',self.num)
         t_flops=train(self.state, self.num)
-        print('self num=',self.num)
         acc = evaluate(self.state,self.num)
         acc=acc/100
         flops=(18700000-t_flops)/18700000
@@ -243,7 +148,6 @@ class SimulatedAnnealer(Annealer):
         if acc>0.5:
             e+=0.1
         statea=str(self.state)
-        print(colored('rggtrggegergggwgegwgw','yellow'),e)
 
         if e<self.best:
             conn = sqlite3.connect('C:\\Users\\Mohammad\\Desktop\\version 1\\model.bests.db')
@@ -252,14 +156,8 @@ class SimulatedAnnealer(Annealer):
             conn.commit()
             conn.close()
             self.best=e
-            print(colored('4ogmmregreomgerogmreomerormfrofmfoemwfoewmfewofm','red'))
         self.num = self.num + 1
-        print(str(now))
-
         return e
-        #return random.random()
-
-
 def train(state, number):
     path = FLAGS.model_dir + '/' + str(number)
     if not os.path.exists(path):
@@ -324,7 +222,6 @@ def train(state, number):
         flops = tf.profiler.profile(g, run_meta=run_meta, cmd='op', options=opts)
         if flops is not None:
             t_flops=flops.total_float_ops
-            print('wetwyy', t_flops)
     return t_flops,time
 
 
@@ -359,12 +256,6 @@ def evaluate(state,number):
     return ((acc_count / lpatch.shape[0]) * 100)
 
 
-'''if FLAGS.phase == 'train':
-	train()
-elif FLAGS.phase == 'evaluate': 
-	evaluate()
-else:
-	sys.exit('FLAGS.phase = train or evaluate')'''
 if __name__ == '__main__':
     init = [['conv2d', 32, 'same',5],
             ['conv2d', 64, 'same',5],
@@ -378,7 +269,6 @@ if __name__ == '__main__':
             ['conv2d', 64, 'same',5],
             ['conv2d', 64, 'valid',37]]
     tsp = SimulatedAnnealer(init)
-    #print('///////////////////////////////////////////////////////////////')
     tsp.set_schedule(tsp.auto(0.01,10))
     tsp.copy_strategy = "slice"
     state, e = tsp.anneal()

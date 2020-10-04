@@ -1,5 +1,4 @@
 import tensorflow as tf
-import models.win19_dep9 as net19
 import models.win37_dep9 as net37
 import copy
 from tensorflow.python.ops import control_flow_ops
@@ -26,10 +25,6 @@ def create(limage, rimage, targets, state,net_type='win37_dep9'):
 			lbranch = net37.create_network(state1,limage, is_training, reuse=False)
 			#print('fegnngoneognongonegonegog',state)
 			rbranch = net37.create_network(state2,rimage, is_training, reuse=True)
-
-		elif net_type == 'win19_dep9':
-			lbranch = net19.create_network(limage, is_training, reuse=False)
-			rbranch = net19.create_network(rimage, is_training, reuse=True)
 		else:
 			sys.exit('Valid net_type: win37_dep9 or win19_dep9')
 

@@ -2,9 +2,7 @@ import tensorflow as tf
 import os
 import models.net_factory as nf
 import numpy as np
-from data_handler import Data_handler
 from scipy import misc
-import matplotlib.pyplot as plt
 
 flags = tf.app.flags
 
