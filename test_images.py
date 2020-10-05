@@ -3,7 +3,7 @@ import os
 import models.net_factory as nf
 import numpy as np
 from scipy import misc
-
+#This module creating disparity map from left and right pictures
 flags = tf.app.flags
 
 flags.DEFINE_integer('batch_size', 8, 'Batch size.')

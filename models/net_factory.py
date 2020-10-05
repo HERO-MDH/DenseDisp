@@ -4,7 +4,7 @@ import copy
 from tensorflow.python.ops import control_flow_ops
 slim = tf.contrib.slim
 
-
+#Computing the 3-pixel error
 def three_pixel_error(lbranch, rbranch, targets):
 	lbranch2 = tf.squeeze(lbranch, [1])
 	rbranch2 = tf.transpose(tf.squeeze(rbranch, [1]), perm=[0, 2, 1])
@@ -13,17 +13,14 @@ def three_pixel_error(lbranch, rbranch, targets):
 
 	loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=targets, logits=prod_flatten), name='loss')
 	return prod_flatten, loss
-
+#Create the network from layers' list
 def create(limage, rimage, targets, state,net_type='win37_dep9'):
 	is_training = tf.placeholder(tf.bool, [], name='is_training')
 	with tf.name_scope('siamese_' + net_type):
 		if net_type == 'win37_dep9':
-			#print('orgngnewdodwnwofnofnfofno',state)
-			#print('jjjjjjjjjjjjjjjjjjjjjj',type(state))
 			state1=copy.deepcopy(state)
 			state2=copy.deepcopy(state1)
 			lbranch = net37.create_network(state1,limage, is_training, reuse=False)
-			#print('fegnngoneognongonegonegog',state)
 			rbranch = net37.create_network(state2,rimage, is_training, reuse=True)
 		else:
 			sys.exit('Valid net_type: win37_dep9 or win19_dep9')
@@ -47,7 +44,7 @@ def create(limage, rimage, targets, state,net_type='win37_dep9'):
 
 	return net
 
-
+#Inner producting right and left outputs
 def map_inner_product(lmap, rmap):
 	prod = tf.reduce_sum(tf.multiply(lmap, rmap), axis=3, name='map_inner_product')
 	
