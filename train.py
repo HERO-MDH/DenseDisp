@@ -15,18 +15,18 @@ now=datetime.datetime.now()
 flags = tf.app.flags
 
 flags.DEFINE_integer('batch_size', 8, 'Batch size.')
-flags.DEFINE_integer('num_iter', 10000, 'Total training iterations')
-flags.DEFINE_string('model_dir', '/home/mli01/Documents/version 2/mmm', 'Trained network dir')
+flags.DEFINE_integer('num_iter', 5000, 'Total training iterations')
+flags.DEFINE_string('model_dir', 'C:\\Users\\moham\\PycharmProjects\\DenseDisp\\output', 'Trained network dir')
 flags.DEFINE_string('data_version', 'kitti2015', 'kitti2012 or kitti2015')
-flags.DEFINE_string('data_root', '/home/mli01/Desktop/data_scene_flow/data_scene_flow/training', 'training dataset dir')
-flags.DEFINE_string('util_root', '/home/mli01/Pictures/saakuraa-cvpr16_stereo_public-1a41996ef7dd/preprocess/debug_15', 'Binary training files dir')
+flags.DEFINE_string('data_root', 'C:\\Users\\moham\\Desktop\\Projects\\data_scene_flow\\training', 'training dataset dir')
+flags.DEFINE_string('util_root', 'C:\\Users\\moham\\Desktop\\Projects\\data_scene_flow\\save_dir', 'Binary training files dir')
 flags.DEFINE_string('net_type', 'win37_dep9', 'Network type: win37_dep9 pr win19_dep9')
 
 flags.DEFINE_integer('eval_size', 200, 'number of evaluation patchs per iteration')
 flags.DEFINE_integer('num_tr_img', 160, 'number of training images')
 flags.DEFINE_integer('num_val_img', 40, 'number of evaluation images')
 flags.DEFINE_integer('patch_size', 37, 'training patch size')
-flags.DEFINE_integer('num_val_loc', 50000, 'number of validation locations')
+flags.DEFINE_integer('num_val_loc', 50, 'number of validation locations')
 flags.DEFINE_integer('disp_range', 201, 'disparity range')
 flags.DEFINE_string('phase', 'train', 'train or evaluate')
 
@@ -57,10 +57,11 @@ class SimulatedAnnealer(Annealer):
         self.num = 0
         self.best=1
         self.time=0
-        conn=sqlite3.connect('/home/mli01/Documents/version 2/mmm/bests.db')
+        path=FLAGS.model_dir
+        conn=sqlite3.connect(path+'\\bests.db')
         c=conn.cursor()
         c.execute('''CREATE TABLE bestss
-                     (num int, arc text, acc real, t_flops real, energy real,time real)''')
+                     (num int, arc text, acc real, t_flops real, energy real)''')
         conn.commit()
         conn.close()
         super(SimulatedAnnealer, self).__init__(state)
@@ -165,7 +166,7 @@ class SimulatedAnnealer(Annealer):
         statea=str(self.state)
         #Save all the provided models with thier accuracy and FLOPs and Energy in a database table
         if e<self.best:
-            conn = sqlite3.connect('C:\\Users\\Mohammad\\Desktop\\version 1\\model.bests.db')
+            conn = sqlite3.connect(FLAGS.model_dir+'\\bests.db')
             c = conn.cursor()
             c.execute('''INSERT INTO bestss VALUES (?,?,?,?,?)''',[self.num,statea,acc,t_flops,e])
             conn.commit()
@@ -218,7 +219,7 @@ def train(state, number):
                 _, mini_loss = session.run([train_step, loss], feed_dict=train_dict)
                 losses.append(mini_loss)
                 #update the trained weights each 100 iterations
-                if it % 100 == 0:
+                if it % 10 == 0:
                     print('Loss at step: %d: %.6f' % (it, mini_loss))
                     saver.save(session, os.path.join(path, 'model.ckpt'), global_step=snet['global_step'])
                     train_summary = session.run(loss_summary,
@@ -236,7 +237,7 @@ def train(state, number):
         flops = tf.profiler.profile(g, run_meta=run_meta, cmd='op', options=opts)
         if flops is not None:
             t_flops=flops.total_float_ops
-    return t_flops,time
+    return t_flops
 
 #Compute accuracy by evaluating saved models
 def evaluate(state,number):
